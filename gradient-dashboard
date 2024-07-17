@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customizable Dashboard</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        #dashboard {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #00297A;
+            text-align: center;
+        }
+        #gradient-background {
+            height: 200px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input[type="range"], button {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .color-pickers {
+            display: flex;
+            justify-content: space-between;
+        }
+        .color-pickers input[type="color"] {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: none;
+        }
+        button {
+            background-color: #00297A;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #001f5c;
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard">
+        <h1>Customizable Dashboard</h1>
+        
+        <div id="gradient-background"></div>
+        
+        <div class="control-group">
+            <label for="aspect-ratio">Aspect Ratio:</label>
+            <select id="aspect-ratio">
+                <option value="16/9">16:9</option>
+                <option value="4/3">4:3</option>
+                <option value="1/1">1:1</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label>Colors:</label>
+            <div class="color-pickers">
+                <input type="color" class="gradient-color" value="#00297A">
+                <input type="color" class="gradient-color" value="#0073B1">
+                <input type="color" class="gradient-color" value="#00A3E0">
+                <input type="color" class="gradient-color" value="#00B5E2">
+                <input type="color" class="gradient-color" value="#78BE20">
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label for="speed">Animation Speed:</label>
+            <input type="range" id="speed" min="1" max="20" value="10">
+        </div>
+        
+        <div class="control-group">
+            <label for="pattern">Gradient Pattern:</label>
+            <select id="pattern">
+                <option value="45deg">Diagonal</option>
+                <option value="90deg">Vertical</option>
+                <option value="180deg">Horizontal</option>
+                <option value="circle">Radial</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label for="bg-color">Background Color:</label>
+            <input type="color" id="bg-color" value="#FFFFFF">
+        </div>
+        
+        <button id="export-btn">Export Configuration</button>
+    </div>
+
+    <script>
+        const gradientBackground = document.getElementById('gradient-background');
+        const aspectRatio = document.getElementById('aspect-ratio');
+        const colorPickers = document.querySelectorAll('.gradient-color');
+        const speed = document.getElementById('speed');
+        const pattern = document.getElementById('pattern');
+        const bgColor = document.getElementById('bg-color');
+        const exportBtn = document.getElementById('export-btn');
+
+        function updateGradient() {
+            const colors = Array.from(colorPickers).map(picker => picker.value).join(', ');
+            const gradientPattern = pattern.value;
+            gradientBackground.style.backgroundImage = `linear-gradient(${gradientPattern}, ${colors})`;
+            gradientBackground.style.animationDuration = `${speed.value}s`;
+            document.body.style.backgroundColor = bgColor.value;
+            gradientBackground.style.aspectRatio = aspectRatio.value;
+        }
+
+        [aspectRatio, speed, pattern, bgColor, ...colorPickers].forEach(el => {
+            el.addEventListener('input', updateGradient);
+        });
+
+        exportBtn.addEventListener('click', function() {
+            const config = {
+                aspectRatio: aspectRatio.value,
+                colors: Array.from(colorPickers).map(picker => picker.value),
+                speed: speed.value,
+                pattern: pattern.value,
+                backgroundColor: bgColor.value
+            };
+            const blob = new Blob([JSON.stringify(config, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'dashboard-config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        updateGradient();
+    </script>
+</body>
+</html>
